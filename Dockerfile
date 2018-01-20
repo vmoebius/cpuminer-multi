@@ -5,21 +5,22 @@
 #
 #
 
-FROM		ubuntu:12.10
-MAINTAINER	Guillaume J. Charmes <guillaume@charmes.net>
+FROM ubuntu:16.04
+MAINTAINER	Volker Moebius <vmoebius@gmail.com>
 
-RUN		apt-get update -qq
+RUN	apt-get update -qq
 
-RUN		apt-get install -qqy automake
-RUN		apt-get install -qqy libcurl4-openssl-dev
-RUN		apt-get install -qqy git
-RUN		apt-get install -qqy make
+RUN	apt-get install -qqy automake
+RUN	apt-get install -qqy libcurl4-openssl-dev
+RUN	apt-get install -qqy libssl-dev
+RUN	apt-get install -qqy gcc
+RUN	apt-get install -qqy make
 
-RUN		git clone https://github.com/pooler/cpuminer
+RUN mkdir -p /usr/src/miner
+COPY . /usr/src/miner
+WORKDIR /usr/src/miner
+RUN ./autogen.sh
+RUN ./configure CFLAGS="-O3"
+RUN make
 
-RUN		cd cpuminer && ./autogen.sh
-RUN		cd cpuminer && ./configure CFLAGS="-O3"
-RUN		cd cpuminer && make
-
-WORKDIR		/cpuminer
-ENTRYPOINT	["./minerd"]
+ENTRYPOINT	["/usr/src/miner/minerd"]
